@@ -1,4 +1,3 @@
-from django.shortcuts import redirect
 from flask import Flask, render_template, session, redirect, url_for
 # flask sessions to give everyone a different game
 from flask_session import Session
