@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Draw    
+{% endblock %}
+
+{% block main %}
+    <h1>Draw</h1>
+
+    <!-- Choose Color -->
+    <select>
+        <option value="black">Black</option>
+        <option value="blue" >Blue</option>
+        <option value="red" >Red</option>
+    </select>
+
+    <!-- Choose Width -->
+    <select id="size">
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+    </select>
+    
+    <!-- Clear Drawing -->
+    <button id="clear">Clear</button>
+
+    <br>
+    <br>
+    <!-- Display Area  -->
+    <svg id="svg" style="width:75%; height:500px; border:1px solid black"></svg>
+
+
+</body>
+<br>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+    
+
+
+    const svg = d3.select('#svg');
+    let drawing = false;
+    parent_coords = [];
+    color = "black"
+    size = 20
+
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelector('select').onchange = function() {
+            color = this.value;
+        };
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelector('#size').onchange = function() {
+            size = parseInt(this.value);
+            console.log(size);
+        };
+    });
+
+    function draw_point() {
+        if (!drawing)
+            return;
+
+        const coords = d3.mouse(this);
+
+        if (parent_coords.length > 0) {
+            // chained functions
+            svg.append('line')
+                .attr('x1', parent_coords[0]) // X1 and Y1 correspond to first endpoint
+                .attr('y1', parent_coords[1])
+                .attr('x2', coords[0]) // X2 and Y2 correspond to second endpoint
+                .attr('y2', coords[1])
+                .style('stroke', `${color}`)
+                .style('stroke-width', `${size+40}`);
+        }
+
+
+        svg.append('circle')
+            .attr('cx', coords[0])
+            .attr('cy', coords[1])
+            .attr('r', 20)
+            .style('fill', `${color}`)
+            .style('stroke', `${color}`)
+            .style('stroke-width', parseInt(`${size}`));
+ 
+        parent_coords = coords;
+    };
+
+    svg.on('mousedown', () => {
+        drawing = true;
+    });
+
+    svg.on('mouseup', () => {
+        drawing = false;
+        parent_coords = []
+    });
+
+    svg.on('mousemove', draw_point);
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector("#clear").onclick = () => {
+            svg.text('');
+        };
+    });
+
+</script>
+  
+{% endblock %}

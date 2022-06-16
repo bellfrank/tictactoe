@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title%}
+    Menu
+{% endblock %}
+
+{% block main %}
+<ul>
+    <a href="/tictactoe">Tic Tac Toe</a>
+    <p>Implemented an AI to play Tic-Tac-Toe optimally.</p>
+    <img src="/static/minmax.jpeg" width="500px" height="300px">
+</ul>
+<ul>
+    <a href="/draw">Draw</a>
+    <p>Created using SVG's (Scalalabe vector graphics) and D3js library to interact with the vector graphics.
+        Points are drawn on a screen using the mouse x and y coordinates.
+        Some of the obstacles I ran into had to do with browsers in general and that they can only fire events every so many milliseconds. To combat this I fill in lines between dots creating the illusion of smooth strokes when drawing. </p>
+        </p>
+    
+</ul>
+<ul>
+    <a href="/quiz">Quiz</a>
+    <p>Implemented using JavaScript to modify the DOM entirely client side</p>
+</ul>
+<ul>
+    <a href="">Flashcards</a>
+    <p>Implemented using REACT which is a declarative style of coding (this is what I want it to look like, you figure it out).
+        It uses JSX instead of JavaScript. I also use Babel to translate JSX -> JavaScript since most browsers don't understand JSX.
+        In REACT we have to think about our application in components and states, and how those components are going to behave. What makes REACT powerful is
+        if you change the state, the view also changes.
+    </p>
+    <p>Bugs: Currently working on a feature using componentDidMount that allows us to store data in browsers when user exits or refreshes page.
+        I need to reconsider my approach since browsers tend to store information in Local Storage as a string and need to parse and stringify my data acoordingly.
+    </p>
+</ul>
+<!-- <ul>
+    <a href="">Connect 4</a>
+    <p>More REACT :)</p>
+</ul> -->
+
+
+{% endblock %}

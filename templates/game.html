@@ -1,12 +1,15 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>
+{% extends "layout.html" %}
+
+{% block title%}
             Tic Tac Toe
-        </title>
+{% endblock %}
+
+{% block main %}
         <style>
            table{
-               border-collapse: collapse;
+                border-collapse: collapse;
+                margin-left: auto;
+                margin-right: auto;
            }
            td {
                 border: 1px solid black;
@@ -19,8 +22,12 @@
                 font-size: 18px;
             }
         </style>
-    </head>
+    <h1>Tic Tac Toe</h1>
     <body>
+        {% if winner %}
+            {{ turn }} won!
+            <a href="{{ url_for('reset') }}"> Play again </a>
+        {% else %}
         <table>
             {% for i in range(3) %}
                 <tr>
@@ -36,5 +43,10 @@
                 </tr>
             {% endfor %}
         </table>
+        <p></p>
+        <a href="{{ url_for('reset') }}"> Reset Game</a>
+        <a href="{{ url_for('help') }}">Let AI make a move </a>
+        
+        {% endif %}
     </body>
-</html>
+{% endblock %}
