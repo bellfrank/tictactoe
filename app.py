@@ -1,9 +1,11 @@
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask, render_template, session, redirect, url_for, request
 # flask sessions to give everyone a different game
 from flask_session import Session
 from tempfile import mkdtemp
 import math
-from helpers import apology
+import datetime
+import requests
+from helpers import apology, numcheck
 
 app = Flask(__name__)
 
@@ -25,7 +27,7 @@ Empty = None
 def index():
     return render_template("index.html")
 
-# TIC TAC TOE
+############################## TIC TAC TOE ############################## 
 
 @app.route("/tictactoe")
 def tictactoe():
@@ -171,7 +173,166 @@ def minimax(game, turn):
     
     print(step)
     return step
+############################## END OF TIC TAC TOE ############################## 
 
+
+
+
+############################## Mastergame ##############################
+
+# Global Variables
+API_CALL = False
+numbers = []
+
+@app.route("/mastergame")
+def mastergame():
+
+    if "combinations" not in session:
+        session["combinations"] = []
+    if "attempts" not in session:
+        session["attempts"] = 10
+    if "score" not in session:
+        session["score"] = 0
+
+    return render_template("mastergame.html",
+        now = datetime.datetime.now(),
+        combinations = session["combinations"],
+        attempts = session["attempts"],
+        score = session["score"]
+    )
+
+
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    # Global variables
+    global API_CALL
+    global numbers
+
+    # Request 4 RANDOM integers from API (fetched once per game)
+    if not API_CALL:
+        response = requests.get('https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new')
+        numbers = response.text
+        API_CALL = True
+
+    # If user submits 4 digits
+    if request.method == "POST":
+        guess_counter = 0
+       
+        comb1 = int(request.form.get("number1"))
+        comb2 = int(request.form.get("number2"))
+        comb3 = int(request.form.get("number3"))
+        comb4 = int(request.form.get("number4"))
+        
+        numbers_copy = []
+
+        k = 0
+        for num in numbers:
+            if(num == '\n'):
+                continue
+            numbers_copy.append(int(num))
+            k += 1
+
+
+        # Backend 4 digit validation
+        if not numcheck(comb1) or not numcheck(comb2) or not numcheck(comb3) or not numcheck(comb4):
+            return render_template("mastergame.html",
+            now = datetime.datetime.now(),
+            message = "invalid input",
+            combinations = session["combinations"],
+            attempts = session["attempts"],
+            score = session["score"]
+        )
+    
+        # Checking user input against API number and generates feedback
+
+        if comb1 == int(numbers[0]) and comb2 == int(numbers[2]) and comb3 == int(numbers[4]) and comb4 == int(numbers[6]):
+            guess_message = "Well done! You guessed the correct number :)"
+            session["score"] += 1
+            session["attempts"] = 10
+            session["combinations"] = []
+            API_CALL = False
+            
+            return render_template("mastergame.html",
+            now = datetime.datetime.now(),
+            combinations = session["combinations"],
+            attempts = session["attempts"],
+            score = session["score"],
+            guess_message = guess_message,
+        )
+
+        # N numbers correct and the right location
+        flag1 = False
+        flag2 = False
+        flag3 = False
+        flag4 = False
+
+        if(comb1 == int(numbers[0])):
+            guess_counter += 1
+            flag1 = True
+        if(comb2 == int(numbers[2])):
+            guess_counter +=1
+            flag2 = True
+        if(comb3 == int(numbers[4])):
+            guess_counter += 1
+            flag3 = True
+        if(comb4 == int(numbers[6])):
+            guess_counter += 1
+            flag4 = True
+        
+        
+        # If you guessed correct numbers but in the wrong location
+        # searching the list and if the user's input is in the list
+        guess_counter2 = 0
+        
+        if not flag1 and comb1 in numbers_copy:
+            guess_counter2 += 1
+        if not flag2 and comb2 in numbers_copy:
+            guess_counter2 += 1
+        if not flag3 and comb3 in numbers_copy:
+            guess_counter2 += 1
+        if not flag4 and comb4 in numbers_copy:
+            guess_counter2 += 1
+        
+
+        guess_message = f"You have guessed {guess_counter} numbers correctly and their right location! :)" + f"You also guessed {guess_counter2} numbers correctly but not in their right location!"
+
+        if guess_counter == 0 and guess_counter2 == 0:
+            guess_message = "Your guess was incorrect :("
+
+        # Add user guess to history of guesses
+        session["combinations"] += [f"{comb1}  {comb2}  {comb3}  {comb4} - {guess_message}"]
+        session["attempts"] -= 1
+
+        
+        return render_template("mastergame.html",
+            now = datetime.datetime.now(),
+            combinations = session["combinations"],
+            attemps = session["attempts"],
+            score = session["score"],
+            guess_message = guess_message,
+        )
+    
+    else:
+        return redirect(url_for("mastergame"))
+
+@app.route("/resetmastergame", methods=["POST"])
+def resetmastergame():
+    # resets number by allowing API to get called again, once
+    global API_CALL
+    API_CALL = False
+    
+    session["combinations"] = []
+    session["attempts"] = 10
+    session["score"] = 0
+    
+    return redirect(url_for("mastergame"))
+
+
+
+
+
+
+############################## END OF MASTERGAME ##############################
 
 # Connect4
 @app.route("/connect4")
@@ -203,9 +364,3 @@ def flashcards():
 
 if __name__ == "__main__":
     app.run()
-
-
-# list comprehension example
-# ls = [[1,2],[3,4],[5,6]]
-# >>> x = 7
-# >>> [(i, e.index(x)) for i, e in enumerate(ls) if x in e]

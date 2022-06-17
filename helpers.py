@@ -18,3 +18,6 @@ def apology(message, code=400):
         return s
     return render_template("apology.html", top=code, bottom=escape(message)), code
 
+def numcheck(number):
+    if number <= 7 and number >= 0:
+        return True

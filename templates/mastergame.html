@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block title%}
+            Mastergame
+{% endblock %}
+
+{% block main %}
+<script src="/static/index.js"></script>
+<link href="/static/mastergame.css" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link href="data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAAAG37JAHL//wA0mOoAL9D/AAUlbQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQAAAAAAAAAAAQEEBAQEBAQEAAAAAAAAAQEEBAEBAQQEBAQAAAAAAQEEAQEEBAQBBAQEAAAAAAEEAQQEAgICBAQEAgAAAAABAQQCAgICAgQEAgAAAAAAAQECAgICAgQEAgIAAAAAAAECAgICAgQEAgIAAAAAAAABBAQEAAAEAgIFBQAAAAAAAAAAAAAABAIFAwMDAwAAAAAAAAAAAAQCAgQEAAAAAAAAAAAAAAAEAgAEAAAAAAAAAAAAAAAABAIAAgAAAAAAAAAAAAAAAAQEAgICAAAAAAAAAAAAAAAAAAAAAAAAAPgPAADwBwAA4AMAAMABAACAAQAAgAEAAIADAACAAwAAgAcAAIAAAACCAAAA/gAAAP4DAAD+AwAA/gMAAP8HAAA=" rel="icon" type="image/x-icon" />
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+
+    {% if message %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+    
+    <h7 id="clock" style="float: right;"></h7>
+    <br>
+    <br>
+    <main class="container p-5">
+
+        {% if attempts != 0 %}
+        
+        {% if guess_message %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" id="guess_message">
+            <strong>{{guess_message}}</strong>
+            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+        <h2> Guess the <strong><span style="color: green;">4</span></strong> digit combination</h2>
+        
+        <h5>Attempts remaining: <span style="color: blue">{{attempts}}</span></h5>
+        
+            <form action="{{ url_for('add') }}" method="post">
+                <input class="digits" type="number" id="number1" name="number1" min="0" max="7" required="true" autocomplete="off" autofocus/>
+                <input class="digits" type="number" id="number2" name="number2" min="0" max="7" required="true" autocomplete="off"/>
+                <input class="digits" type="number" id="number3" name="number3" min="0" max="7" required="true" autocomplete="off"/>
+                <input class="digits" type="number" id="number4" name="number4" min="0" max="7" required="true" autocomplete="off"/>
+                <p></p>
+
+                <button id="timer_button" type="submit" class="btn btn-primary" disabled> Submit </button>
+            </form>
+
+            <h2 style="float: left;">Score: {{score}}</h2>
+            <br>
+            <br>
+            <h2 style="float: left;">Timer: <span id="timer">0</span></h2>
+            <br>
+            <br>
+        
+        {% else %}
+            <h1>Try again :(</h1>
+            <h2> Final Score: {{score }} </h2>
+        {% endif %}
+        <br>
+        <br>
+        <h2>Guess History</h2>
+
+        <form action="{{ url_for('resetmastergame') }}" method="post"> 
+            {% if attempts == 10 %}
+            
+                <button type="submit" style="float: right;" disabled>Reset Game</button>
+            {% else %}
+                <button type="submit" class="btn-sm btn-danger" style="float: right;" onclick="reset_timer()">Reset Game</button>
+            {% endif %}
+
+        </form>
+        <br><br>
+    <table>
+    <tr>
+        <th>Guess Combination</th>
+    </tr>
+        {% for combination in combinations %}
+        <tr>
+            <td style="text-align: center;">{{combination}}</td>
+        </tr>
+        {% else %}
+            <td>No attempts yet.</td>
+        {% endfor %}
+    </table>
+        
+</main>
+
+{% endblock %}
